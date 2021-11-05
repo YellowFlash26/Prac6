@@ -1,4 +1,9 @@
+// Code your design here
 `timescale 1ns / 1ps
+`include "alu.v"
+`include "CU.v"
+`include "RegMem.v"
+
 
 module simple_cpu( clk, rst, instruction );
 
@@ -11,7 +16,7 @@ module simple_cpu( clk, rst, instruction );
 
     //Wires for connecting to data memory    
     wire [ADDR_BITS-1:0] addr_i;
-    wire [DATA_WIDTH-1:0] data_in_i, data_out_i, result2_i ;
+    wire [DATA_WIDTH-1:0]  data_in_i, result2_i, data_out_i;
     wire wen_i; 
     
     //wire for connecting to the ALU
@@ -30,11 +35,11 @@ module simple_cpu( clk, rst, instruction );
     alu #(DATA_WIDTH) alu1 (clk, operand_a_i, operand_b_i, opcode_i, result1_i);
      
     //instantiation of data memory
-    reg_mem  #(DATA_WIDTH,ADDR_BITS) data_memory(result1_i, data_in_i, wen_i, clk, data_out_i);
+    reg_mem  #(DATA_WIDTH,ADDR_BITS) data_memory(addr_i, data_in_i, wen_i, clk, data_out_i);
     
     //Instantiation of a CU
     CU  #(DATA_WIDTH,ADDR_BITS, INSTR_WIDTH) CU1(clk, rst, instruction, result2_i,
-        operand_1_i, operand_2_i, offset_i, opcode_i, sel1_i, sel3_i, wen_i);
+        operand_1_i, operand_2_i, offset_i, opcode_i, sel1_i, sel3_i, wen_i, reg0, reg1, reg2, reg3);
     
 
     
@@ -47,30 +52,9 @@ module simple_cpu( clk, rst, instruction );
     
     //Connect datamem to CU
     assign result2_i = (sel1_i == 0) ? data_out_i : (sel1_i == 1) ? result1_i : 8'bx;  
-    
-
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 endmodule
-
 
 
 
